@@ -3,7 +3,8 @@ import { FlatList, View, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { List, Divider } from 'react-native-paper';
 
-function Calendario({ excursiones }) {
+function Calendario({ excursiones, onPress }) {
+    
     const renderCalendarioItem = ({ item }) => {
         return (
             <View>
@@ -12,6 +13,7 @@ function Calendario({ excursiones }) {
                     description={item.descripcion}
                     titleNumberOfLines={0}
                     descriptionNumberOfLines={6}
+                    onPress={() => onPress(item.id)}
                     left={(props) => (
                         <Image
                             source={require('./imagenes/40Años.png')}
@@ -40,11 +42,24 @@ function Calendario({ excursiones }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
-    imagen: { width: 40, height: 40, alignSelf: 'center' },
-    contenido: { paddingRight: 8 },
-    titulo: { fontSize: 16 },
-    descripcion: { fontSize: 14, lineHeight: 20 },
+    container: { 
+        flex: 1 
+    },
+    imagen: { 
+        width: 40, 
+        height: 40, 
+        alignSelf: 'center' 
+    },
+    contenido: { 
+        paddingRight: 8 
+    },
+    titulo: { 
+        fontSize: 16 
+    },
+    descripcion: { 
+        fontSize: 14, 
+        lineHeight: 20 
+    },
 });
 
 export default Calendario;

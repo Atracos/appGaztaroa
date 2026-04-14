@@ -1,37 +1,48 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Calendario from './CalendarioComponent';
 import DetalleExcursion from './DetalleExcursionComponent';
 import { EXCURSIONES } from '../comun/excursiones';
 
+const Stack = createNativeStackNavigator(); // Crea el menú de navegación en stack [cite: 567]
+
+function CalendarioStack() {
+  return (
+    <Stack.Navigator
+      initialRouteName="Calendario"
+      screenOptions={{
+        headerStyle: { backgroundColor: '#3300FF' },
+        headerTintColor: '#fff',
+        headerTitleStyle: { fontWeight: 'bold' },
+      }}
+    >
+      <Stack.Screen 
+        name="Calendario" 
+        options={{ title: 'Calendario Gaztaroa' }}
+      >
+        {(props) => <Calendario {...props} excursiones={EXCURSIONES} />}
+      </Stack.Screen>
+      <Stack.Screen 
+        name="DetalleExcursion" 
+        component={DetalleExcursion} 
+        options={{ title: 'Detalle Excursión' }} 
+      />
+    </Stack.Navigator>
+  );
+}
+
 class Campobase extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            excursiones: EXCURSIONES,
-            seleccionExcursion: null // Almacena el ID de la excursión seleccionada [cite: 447-450]
-        };
-    }
-
-    onSeleccionExcursion(excursionId) {
-        this.setState({ seleccionExcursion: excursionId });
-    }
-
-    render() {
-        return (
-            <View style={{ flex: 1 }}>
-                {/* Renderiza el detalle filtrando la excursión por el ID del estado [cite: 460] */}
-                <DetalleExcursion 
-                    excursion={this.state.excursiones.filter((excursion) => excursion.id === this.state.seleccionExcursion)[0]} 
-                />
-                {/* Pasa la función de selección al Calendario [cite: 462] */}
-                <Calendario 
-                    excursiones={this.state.excursiones} 
-                    onPress={(excursionId) => this.onSeleccionExcursion(excursionId)} 
-                />
-            </View>
-        );
-    }
+  render() {
+    return (
+      <NavigationContainer>
+        <View style={{ flex: 1 }}>
+          <CalendarioStack />
+        </View>
+      </NavigationContainer>
+    );
+  }
 }
 
 export default Campobase;

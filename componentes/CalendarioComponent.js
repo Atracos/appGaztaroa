@@ -3,7 +3,8 @@ import { FlatList, View, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { List, Divider } from 'react-native-paper';
 
-function Calendario({ excursiones, onPress }) {
+// IMPORTANTE: Ahora recibe "navigation" además de "excursiones"
+function Calendario({ excursiones, navigation }) {
     
     const renderCalendarioItem = ({ item }) => {
         return (
@@ -13,7 +14,9 @@ function Calendario({ excursiones, onPress }) {
                     description={item.descripcion}
                     titleNumberOfLines={0}
                     descriptionNumberOfLines={6}
-                    onPress={() => onPress(item.id)}
+                    // CAMBIO CLAVE: Ya no llamamos a una función interna, 
+                    // sino que le decimos al navegador que cambie de pantalla
+                    onPress={() => navigation.navigate('DetalleExcursion', { excursionId: item.id })} 
                     left={(props) => (
                         <Image
                             source={require('./imagenes/40Años.png')}
@@ -42,24 +45,11 @@ function Calendario({ excursiones, onPress }) {
 }
 
 const styles = StyleSheet.create({
-    container: { 
-        flex: 1 
-    },
-    imagen: { 
-        width: 40, 
-        height: 40, 
-        alignSelf: 'center' 
-    },
-    contenido: { 
-        paddingRight: 8 
-    },
-    titulo: { 
-        fontSize: 16 
-    },
-    descripcion: { 
-        fontSize: 14, 
-        lineHeight: 20 
-    },
+    container: { flex: 1 },
+    imagen: { width: 40, height: 40, alignSelf: 'center' },
+    contenido: { paddingRight: 8 },
+    titulo: { fontSize: 16 },
+    descripcion: { fontSize: 14, lineHeight: 20 },
 });
 
 export default Calendario;

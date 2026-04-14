@@ -10,6 +10,8 @@ import Home from './HomeComponent';
 import Calendario from './CalendarioComponent';
 import DetalleExcursion from './DetalleExcursionComponent';
 import { EXCURSIONES } from '../comun/excursiones';
+import QuienesSomos from './QuienesSomosComponent';
+import Contacto from './ContactoComponent';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -68,6 +70,22 @@ function CalendarioNavegador({ navigation, excursiones }) {
   );
 }
 
+function QuienesSomosNavegador({ navigation }) {
+  return (
+    <Stack.Navigator screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#015afc' }, headerTitleStyle: { color: '#fff' }, headerLeft: () => (<TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}><Ionicons name="menu" size={28} color="white" /></TouchableOpacity>) }}>
+      <Stack.Screen name="Quiénes somos" component={QuienesSomos} options={{ title: 'Quiénes somos' }} />
+    </Stack.Navigator>
+  );
+}
+
+function ContactoNavegador({ navigation }) {
+  return (
+    <Stack.Navigator screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#015afc' }, headerTitleStyle: { color: '#fff' }, headerLeft: () => (<TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}><Ionicons name="menu" size={28} color="white" /></TouchableOpacity>) }}>
+      <Stack.Screen name="Contacto" component={Contacto} options={{ title: 'Contacto' }} />
+    </Stack.Navigator>
+  );
+}
+
 class Campobase extends Component {
   constructor(props) {
     super(props);
@@ -89,6 +107,8 @@ class Campobase extends Component {
             <Drawer.Screen name="Calendario">
               {(props) => <CalendarioNavegador {...props} excursiones={this.state.excursiones} />}
             </Drawer.Screen>
+            <Drawer.Screen name="Quiénes somos" component={QuienesSomosNavegador} />
+            <Drawer.Screen name="Contacto" component={ContactoNavegador} />
           </Drawer.Navigator>
         </View>
       </NavigationContainer>

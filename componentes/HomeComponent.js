@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
-import { StyleSheet, ScrollView, View } from 'react-native';
+import { ScrollView, View, StyleSheet, ImageBackground } from 'react-native';
 import { Card, Text } from 'react-native-paper';
 import { EXCURSIONES } from '../comun/excursiones';
 import { CABECERAS } from '../comun/cabeceras';
 import { ACTIVIDADES } from '../comun/actividades';
 
-function RenderItem(props) {
-    const item = props.item;
-    if (item != null) {
-        return (
-            <Card style={styles.card}>
-                <Card.Title title={item.nombre} />
-                <Card.Cover source={require('./imagenes/40Años.png')} />
-                <Card.Content>
-                    <Text style={styles.text}>{item.descripcion}</Text>
-                </Card.Content>
-            </Card>
-        );
-    }
-    return <View />;
+function RenderItem({ item }) {
+    if (!item) return <View />;
+    
+    return (
+        <Card style={styles.card}>
+            <ImageBackground source={require('./imagenes/40Años.png')} style={styles.imageBackground}>
+                <View style={styles.overlay}>
+                    <Text style={styles.tituloChocolate}>{item.nombre}</Text>
+                </View>
+            </ImageBackground>
+            <Card.Content>
+                <Text style={styles.descripcion}>{item.descripcion}</Text>
+            </Card.Content>
+        </Card>
+    );
 }
 
 class Home extends Component {
@@ -43,7 +44,10 @@ class Home extends Component {
 
 const styles = StyleSheet.create({
     card: { margin: 10 },
-    text: { marginTop: 20 }
+    descripcion: { marginTop: 20 },
+    imageBackground: { height: 200, justifyContent: 'flex-end' },
+    overlay: { backgroundColor: 'rgba(255, 255, 255, 0.7)', padding: 10 }, // Fondo semi-transparente para leer mejor el texto
+    tituloChocolate: { fontSize: 24, fontWeight: 'bold', color: 'chocolate', textAlign: 'center' }
 });
 
 export default Home;

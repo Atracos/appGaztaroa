@@ -1,119 +1,142 @@
 import React, { Component } from 'react';
-import { Platform, View, TouchableOpacity } from 'react-native';
+import { Platform, View, StyleSheet, Image, Text, Pressable } from 'react-native';
 import Constants from 'expo-constants';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DrawerActions } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import { Ionicons } from '@expo/vector-icons'; // <--- Importamos los iconos
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 import Home from './HomeComponent';
 import Calendario from './CalendarioComponent';
 import DetalleExcursion from './DetalleExcursionComponent';
-import { EXCURSIONES } from '../comun/excursiones';
 import QuienesSomos from './QuienesSomosComponent';
 import Contacto from './ContactoComponent';
+import { EXCURSIONES } from '../comun/excursiones';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
-// Recibimos "navigation" para poder abrir el Drawer
-function HomeNavegador({ navigation }) {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerTintColor: '#fff',
-        headerStyle: { backgroundColor: '#015afc' },
-        headerTitleStyle: { color: '#fff' },
-        // Añadimos el botón a la izquierda de la cabecera
-        headerLeft: () => ( 
-          <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}>
-            <Ionicons name="menu" size={28} color="white" />
-          </TouchableOpacity>
-        ),
-      }}
-    >
-      <Stack.Screen name="Home" component={Home} options={{ title: 'Campo Base' }} />
-    </Stack.Navigator>
-  );
+function BotonMenu(props) {
+    return (
+        <Pressable onPress={props.onPress} hitSlop={8} style={{ marginLeft: 10 }}>
+            <MaterialCommunityIcons
+                name="menu"
+                size={28}
+                color={Platform.OS === 'ios' ? '#015afc' : 'white'}
+            />
+        </Pressable>
+    );
 }
 
-// Recibimos "navigation" y "excursiones"
-function CalendarioNavegador({ navigation, excursiones }) {
-  return (
-    <Stack.Navigator
-      initialRouteName="Calendario"
-      screenOptions={{
-        headerTintColor: '#fff',
-        headerStyle: { backgroundColor: '#015afc' },
-        headerTitleStyle: { color: '#fff' },
-      }}
-    >
-      <Stack.Screen 
-        name="Calendario" 
-        options={{ 
-          title: 'Calendario Gaztaroa',
-          // Botón de menú también aquí
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}>
-              <Ionicons name="menu" size={28} color="white" />
-            </TouchableOpacity>
-          ),
-        }}
-      >
-        {(props) => <Calendario {...props} excursiones={excursiones} />}
-      </Stack.Screen>
-      
-      <Stack.Screen name="DetalleExcursion" options={{ title: 'Detalle Excursión' }}>
-        {(props) => <DetalleExcursion {...props} excursiones={excursiones} />}
-      </Stack.Screen>
-    </Stack.Navigator>
-  );
-}
-
-function QuienesSomosNavegador({ navigation }) {
-  return (
-    <Stack.Navigator screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#015afc' }, headerTitleStyle: { color: '#fff' }, headerLeft: () => (<TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}><Ionicons name="menu" size={28} color="white" /></TouchableOpacity>) }}>
-      <Stack.Screen name="Quiénes somos" component={QuienesSomos} options={{ title: 'Quiénes somos' }} />
-    </Stack.Navigator>
-  );
-}
-
-function ContactoNavegador({ navigation }) {
-  return (
-    <Stack.Navigator screenOptions={{ headerTintColor: '#fff', headerStyle: { backgroundColor: '#015afc' }, headerTitleStyle: { color: '#fff' }, headerLeft: () => (<TouchableOpacity onPress={() => navigation.openDrawer()} style={{ marginLeft: 10, marginRight: 15 }}><Ionicons name="menu" size={28} color="white" /></TouchableOpacity>) }}>
-      <Stack.Screen name="Contacto" component={Contacto} options={{ title: 'Contacto' }} />
-    </Stack.Navigator>
-  );
+function CustomDrawerContent(props) {
+    return (
+        <DrawerContentScrollView {...props}>
+            <SafeAreaView style={styles.container} edges={['left', 'right', 'bottom']}>
+                <View style={styles.drawerHeader}>
+                    <View style={styles.drawerHeaderImageContainer}>
+                        <Image source={require('./imagenes/logo.png')} style={styles.drawerImage} />
+                    </View>
+                    <View style={styles.drawerHeaderTextContainer}>
+                        <Text style={styles.drawerHeaderText}>Gaztaroa</Text>
+                    </View>
+                </View>
+                <DrawerItemList {...props} />
+            </SafeAreaView>
+        </DrawerContentScrollView>
+    );
 }
 
 class Campobase extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { excursiones: EXCURSIONES };
-  }
+    constructor(props) {
+        super(props);
+        this.state = { excursiones: EXCURSIONES };
+    }
 
-  render() {
-    return (
-      <NavigationContainer>
-        <View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 0 : Constants.statusBarHeight }}>
-          <Drawer.Navigator
-            initialRouteName="Campo base"
-            screenOptions={{
-              headerShown: false, // Oculta la cabecera doble
-              drawerStyle: { backgroundColor: '#c2d3da' },
-            }}
-          >
-            <Drawer.Screen name="Campo base" component={HomeNavegador} />
-            <Drawer.Screen name="Calendario">
-              {(props) => <CalendarioNavegador {...props} excursiones={this.state.excursiones} />}
-            </Drawer.Screen>
-            <Drawer.Screen name="Quiénes somos" component={QuienesSomosNavegador} />
-            <Drawer.Screen name="Contacto" component={ContactoNavegador} />
-          </Drawer.Navigator>
-        </View>
-      </NavigationContainer>
-    );
-  }
+    menuHeaderOptions = (title, navigation) => ({
+        title,
+        headerTintColor: '#fff',
+        headerStyle: { backgroundColor: '#015afc' },
+        headerTitleStyle: { color: '#fff' },
+        headerLeft: () => (
+            <BotonMenu onPress={() => navigation.dispatch(DrawerActions.toggleDrawer())} />
+        ),
+    });
+
+    render() {
+        return (
+            <NavigationContainer>
+                <View style={{ flex: 1, paddingTop: Platform.OS === 'ios' ? 0 : Constants.statusBarHeight }}>
+                    <Drawer.Navigator
+                        initialRouteName="Campo base"
+                        drawerContent={(props) => <CustomDrawerContent {...props} />}
+                        screenOptions={{ headerShown: false, drawerStyle: { backgroundColor: '#c2d3da' } }}
+                    >
+                        <Drawer.Screen 
+                            name="Campo base" 
+                            options={{ drawerIcon: ({ color }) => <MaterialCommunityIcons name="home" color={color} size={24} /> }}
+                        >
+                            {({ navigation }) => (
+                                <Stack.Navigator screenOptions={this.menuHeaderOptions('Campo Base', navigation)}>
+                                    <Stack.Screen name="Home" component={Home} />
+                                </Stack.Navigator>
+                            )}
+                        </Drawer.Screen>
+
+                        <Drawer.Screen 
+                            name="Quiénes somos" 
+                            options={{ drawerIcon: ({ color }) => <MaterialCommunityIcons name="information" color={color} size={24} /> }}
+                        >
+                            {({ navigation }) => (
+                                <Stack.Navigator screenOptions={this.menuHeaderOptions('Quiénes somos', navigation)}>
+                                    <Stack.Screen name="Quiénes somos" component={QuienesSomos} />
+                                </Stack.Navigator>
+                            )}
+                        </Drawer.Screen>
+
+                        <Drawer.Screen 
+                            name="Calendario" 
+                            options={{ drawerIcon: ({ color }) => <MaterialCommunityIcons name="calendar" color={color} size={24} /> }}
+                        >
+                            {({ navigation }) => (
+                                <Stack.Navigator screenOptions={this.menuHeaderOptions('Calendario Gaztaroa', navigation)}>
+                                    <Stack.Screen name="Calendario">
+                                        {(props) => <Calendario {...props} excursiones={this.state.excursiones} />}
+                                    </Stack.Screen>
+                                    <Stack.Screen 
+                                        name="DetalleExcursion" 
+                                        options={{ headerLeft: null }}
+                                    >
+                                        {(props) => <DetalleExcursion {...props} excursiones={this.state.excursiones} />}
+                                    </Stack.Screen>
+                                </Stack.Navigator>
+                            )}
+                        </Drawer.Screen>
+
+                        <Drawer.Screen 
+                            name="Contacto" 
+                            options={{ drawerIcon: ({ color }) => <MaterialCommunityIcons name="card-account-phone" color={color} size={24} /> }}
+                        >
+                            {({ navigation }) => (
+                                <Stack.Navigator screenOptions={this.menuHeaderOptions('Contacto', navigation)}>
+                                    <Stack.Screen name="Contacto" component={Contacto} />
+                                </Stack.Navigator>
+                            )}
+                        </Drawer.Screen>
+                    </Drawer.Navigator>
+                </View>
+            </NavigationContainer>
+        );
+    }
 }
+
+const styles = StyleSheet.create({
+    container: { flex: 1 },
+    drawerHeader: { backgroundColor: '#015afc', height: 100, flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+    drawerHeaderImageContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+    drawerHeaderTextContainer: { flex: 2, justifyContent: 'center' },
+    drawerHeaderText: { color: 'white', fontSize: 24, fontWeight: 'bold' },
+    drawerImage: { width: 80, height: 60, resizeMode: 'contain' }
+});
 
 export default Campobase;

@@ -1,35 +1,38 @@
 import React, { Component } from 'react';
 import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native';
 import { Card, IconButton } from 'react-native-paper';
-import { EXCURSIONES } from '../comun/excursiones';
-import { COMENTARIOS } from '../comun/comentarios';
+import { baseUrl } from '../comun/comun';
 
 function RenderExcursion(props) {
     const excursion = props.excursion;
-    if (excursion != null) {
+    if (!excursion) {
         return (
-            <Card style={styles.card}>
-                <Card.Title title={excursion.nombre} />
-                <Card.Cover source={require('./imagenes/40Años.png')} />
-                <Card.Content>
-                    <Text style={styles.descripcion}>{excursion.descripcion}</Text>
-                    <View style={styles.iconoContainer}>
-                        <IconButton
-                            icon={props.favorita ? 'heart' : 'heart-outline'}
-                            iconColor="#f50"
-                            size={28}
-                            onPress={() =>
-                                props.favorita
-                                    ? console.log('La excursión ya se encuentra entre las favoritas')
-                                    : props.onPress()
-                            }
-                        />
-                    </View>
-                </Card.Content>
-            </Card>
+            <View style={{ padding: 20 }}>
+                <Text>Cargando...</Text>
+            </View>
         );
     }
-    return <View />;
+    return (
+        <Card style={styles.card}>
+            <Card.Title title={excursion.nombre} />
+            <Card.Cover source={{ uri: baseUrl + excursion.imagen }} />
+            <Card.Content>
+                <Text style={styles.descripcion}>{excursion.descripcion}</Text>
+                <View style={styles.iconoContainer}>
+                    <IconButton
+                        icon={props.favorita ? 'heart' : 'heart-outline'}
+                        iconColor="#f50"
+                        size={28}
+                        onPress={() =>
+                            props.favorita
+                                ? console.log('La excursión ya se encuentra entre las favoritas')
+                                : props.onPress()
+                        }
+                    />
+                </View>
+            </Card.Content>
+        </Card>
+);
 }
 
 function RenderComentario(props) {
@@ -63,10 +66,23 @@ class DetalleExcursion extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            excursiones: EXCURSIONES,
-            comentarios: COMENTARIOS,
+            comentarios: [],
             favoritos: []
         };
+    }
+
+    componentDidMount() {
+        this.fetchData();
+    }
+
+    fetchData = async () => {
+        try {
+            const response = await fetch(`${baseUrl}comentarios`);
+            const comentarios = await response.json();
+            this.setState({ comentarios });
+        } catch (error) {
+            console.error('Error fetching comentarios:', error);
+        }
     }
 
     marcarFavorito(excursionId) {
@@ -74,11 +90,12 @@ class DetalleExcursion extends Component {
     }
 
     render() {
-        const { excursionId } = this.props.route.params;
+        const { excursionId } = this.props.route?.params || {};
+        const excursions = this.props.excursiones || [];
         return (
             <ScrollView>
                 <RenderExcursion
-                    excursion={this.state.excursiones[+excursionId]}
+                    excursion={excursions[+excursionId]}
                     favorita={this.state.favoritos.some((el) => el === excursionId)}
                     onPress={() => this.marcarFavorito(excursionId)}
                 />

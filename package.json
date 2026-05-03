@@ -6,7 +6,9 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "server": "cd json-server && json-server --host 0.0.0.0 db.json -p 3001 -d 2000",
+    "server:local": "cd json-server && json-server --host 127.0.0.1 db.json -p 3001 -d 2000"
   },
   "dependencies": {
     "@react-navigation/drawer": "^7.9.8",
@@ -26,6 +28,7 @@
   },
   "private": true,
   "devDependencies": {
-    "babel-preset-expo": "^55.0.17"
+    "babel-preset-expo": "^55.0.17",
+    "json-server": "^0.17.4"
   }
 }

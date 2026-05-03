@@ -2,6 +2,7 @@ import React from 'react';
 import { FlatList, View, Image, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { List, Divider } from 'react-native-paper';
+import { baseUrl } from '../comun/comun';
 
 // IMPORTANTE: Ahora recibe "navigation" además de "excursiones"
 function Calendario({ excursiones, navigation }) {
@@ -19,7 +20,7 @@ function Calendario({ excursiones, navigation }) {
                     onPress={() => navigation.navigate('DetalleExcursion', { excursionId: item.id })} 
                     left={(props) => (
                         <Image
-                            source={require('./imagenes/40Años.png')}
+                            source={{ uri: baseUrl + item.imagen }}
                             style={[props.style, styles.imagen]}
                             resizeMode="cover"
                         />

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { ScrollView, View, Image, StyleSheet } from 'react-native';
 import { Card, Text, List, Divider } from 'react-native-paper';
 import { ACTIVIDADES } from '../comun/actividades';
+import { baseUrl } from '../comun/comun';
 
 // Tarjeta superior estática
 function Historia() {
@@ -41,7 +42,7 @@ class QuienesSomos extends Component {
                                     titleNumberOfLines={0}
                                     descriptionNumberOfLines={10}
                                     left={(props) => (
-                                        <Image source={require('./imagenes/40Años.png')} style={styles.imagen} />
+                                        <Image source={{ uri: baseUrl + item.imagen }} style={styles.imagen} />
                                     )}
                                 />
                                 <Divider />

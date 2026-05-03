@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import { ScrollView, View, Image, StyleSheet } from 'react-native';
 import { Card, Text, List, Divider } from 'react-native-paper';
-import { ACTIVIDADES } from '../comun/actividades';
 import { baseUrl } from '../comun/comun';
 
 // Tarjeta superior estática
@@ -23,8 +22,22 @@ class QuienesSomos extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            actividades: ACTIVIDADES
+            actividades: []
         };
+    }
+
+    componentDidMount() {
+        this.fetchActividades();
+    }
+
+    fetchActividades = async () => {
+        try {
+            const response = await fetch(`${baseUrl}actividades`);
+            const actividades = await response.json();
+            this.setState({ actividades });
+        } catch (error) {
+            console.error('Error fetching actividades:', error);
+        }
     }
 
     render() {

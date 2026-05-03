@@ -1,7 +1,23 @@
 import React, { Component } from 'react';
-import { Text, View, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { Text, View, ScrollView, FlatList, StyleSheet, ImageBackground } from 'react-native';
 import { Card, IconButton } from 'react-native-paper';
 import { baseUrl } from '../comun/comun';
+
+function formatearFecha(dia) {
+    if (!dia) return '';
+    const fecha = new Date(dia);
+    const opciones = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+    return fecha.toLocaleDateString('es-ES', opciones).replace(',', '');
+}
+
+function mostrarValoracion(valoracion) {
+    const max = 5;
+    let estrellas = '';
+    for (let i = 0; i < max; i++) {
+        estrellas += i < valoracion ? '\u2605' : '\u2606';
+    }
+    return estrellas;
+}
 
 function RenderExcursion(props) {
     const excursion = props.excursion;
@@ -14,8 +30,11 @@ function RenderExcursion(props) {
     }
     return (
         <Card style={styles.card}>
-            <Card.Title title={excursion.nombre} />
-            <Card.Cover source={{ uri: baseUrl + excursion.imagen }} />
+            <ImageBackground source={{ uri: baseUrl + excursion.imagen }} style={styles.imageBackground}>
+                <View style={styles.overlay}>
+                    <Text style={styles.tituloWhite}>{excursion.nombre}</Text>
+                </View>
+            </ImageBackground>
             <Card.Content>
                 <Text style={styles.descripcion}>{excursion.descripcion}</Text>
                 <View style={styles.iconoContainer}>
@@ -23,16 +42,12 @@ function RenderExcursion(props) {
                         icon={props.favorita ? 'heart' : 'heart-outline'}
                         iconColor="#f50"
                         size={28}
-                        onPress={() =>
-                            props.favorita
-                                ? console.log('La excursión ya se encuentra entre las favoritas')
-                                : props.onPress()
-                        }
+                        onPress={() => props.onPress()}
                     />
                 </View>
             </Card.Content>
         </Card>
-);
+    );
 }
 
 function RenderComentario(props) {
@@ -42,8 +57,8 @@ function RenderComentario(props) {
         return (
             <View key={index} style={{ margin: 10 }}>
                 <Text style={{ fontSize: 14 }}>{item.comentario}</Text>
-                <Text style={{ fontSize: 12 }}>{item.valoracion} Estrellas</Text>
-                <Text style={{ fontSize: 12 }}>{`-- ${item.autor}, ${item.dia}`}</Text>
+                <Text style={{ fontSize: 12 }}>{mostrarValoracion(item.valoracion)}</Text>
+                <Text style={{ fontSize: 12 }}>{`-- ${item.autor}, ${formatearFecha(item.dia)}`}</Text>
             </View>
         );
     };
@@ -66,16 +81,15 @@ class DetalleExcursion extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            comentarios: [],
-            favoritos: []
+            comentarios: []
         };
     }
 
     componentDidMount() {
-        this.fetchData();
+        this.fetchComentarios();
     }
 
-    fetchData = async () => {
+    fetchComentarios = async () => {
         try {
             const response = await fetch(`${baseUrl}comentarios`);
             const comentarios = await response.json();
@@ -85,19 +99,17 @@ class DetalleExcursion extends Component {
         }
     }
 
-    marcarFavorito(excursionId) {
-        this.setState({ favoritos: this.state.favoritos.concat(excursionId) });
-    }
-
     render() {
         const { excursionId } = this.props.route?.params || {};
         const excursions = this.props.excursiones || [];
+        const favoritos = this.props.favoritos || [];
+        const marcarFavorito = this.props.marcarFavorito || (() => {});
         return (
             <ScrollView>
                 <RenderExcursion
                     excursion={excursions[+excursionId]}
-                    favorita={this.state.favoritos.some((el) => el === excursionId)}
-                    onPress={() => this.marcarFavorito(excursionId)}
+                    favorita={favoritos.some((el) => el === excursionId)}
+                    onPress={() => marcarFavorito(excursionId)}
                 />
                 <RenderComentario
                     comentarios={this.state.comentarios.filter((comentario) => comentario.excursionId === excursionId)}
@@ -109,6 +121,9 @@ class DetalleExcursion extends Component {
 
 const styles = StyleSheet.create({
     card: { margin: 10 },
+    imageBackground: { height: 200, justifyContent: 'flex-end' },
+    overlay: { backgroundColor: 'rgba(255, 255, 255, 0.7)', padding: 10 },
+    tituloWhite: { fontSize: 24, fontWeight: 'bold', color: 'white', textAlign: 'center' },
     descripcion: { marginTop: 20, marginBottom: 20 },
     iconoContainer: { alignItems: 'center', marginBottom: 8 }
 });

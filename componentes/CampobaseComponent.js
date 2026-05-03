@@ -12,7 +12,6 @@ import Calendario from './CalendarioComponent';
 import DetalleExcursion from './DetalleExcursionComponent';
 import QuienesSomos from './QuienesSomosComponent';
 import Contacto from './ContactoComponent';
-import { EXCURSIONES } from '../comun/excursiones';
 import { baseUrl, colorGaztaroaClaro, colorGaztaroaOscuro } from '../comun/comun';
 
 const Stack = createNativeStackNavigator();
@@ -51,7 +50,10 @@ function CustomDrawerContent(props) {
 class Campobase extends Component {
     constructor(props) {
         super(props);
-        this.state = { excursiones: [], loading: true };
+        this.state = {
+            excursiones: [],
+            favoritos: []
+        };
     }
 
     componentDidMount() {
@@ -62,10 +64,18 @@ class Campobase extends Component {
         try {
             const response = await fetch(`${baseUrl}excursiones`);
             const excursiones = await response.json();
-            this.setState({ excursiones, loading: false });
+            this.setState({ excursiones });
         } catch (error) {
             console.error('Error fetching excursiones:', error);
-            this.setState({ loading: false });
+        }
+    }
+
+    marcarFavorito = (excursionId) => {
+        const isFav = this.state.favoritos.some((el) => el === excursionId);
+        if (isFav) {
+            this.setState({ favoritos: this.state.favoritos.filter((el) => el !== excursionId) });
+        } else {
+            this.setState({ favoritos: this.state.favoritos.concat(excursionId) });
         }
     }
 
@@ -115,15 +125,18 @@ class Campobase extends Component {
                             options={{ drawerIcon: ({ color }) => <MaterialCommunityIcons name="calendar" color={color} size={24} /> }}
                         >
                             {({ navigation }) => {
-                                const excursionData = { excursions: this.state.excursiones };
+                                const excursionData = { excursiones: this.state.excursiones, favoritos: this.state.favoritos, marcarFavorito: this.marcarFavorito };
                                 return (
                                     <Stack.Navigator screenOptions={this.menuHeaderOptions('Calendario Gaztaroa', navigation)}>
                                         <Stack.Screen name="Calendario">
-                                            {(props) => <Calendario {...props} navigation={navigation} {...excursionData} />}
+                                            {(props) => <Calendario {...props} {...excursionData} />}
                                         </Stack.Screen>
                                         <Stack.Screen 
                                             name="DetalleExcursion" 
-                                            options={({ route }) => ({ title: this.state.excursiones[route.params?.excursionId]?.nombre || 'Excursión' })}
+                                            options={({ route }) => ({
+                                                title: this.state.excursiones[route.params?.excursionId]?.nombre || 'Excursión',
+                                                headerLeft: undefined,
+                                            })}
                                         >
                                             {(props) => <DetalleExcursion {...props} {...excursionData} />}
                                         </Stack.Screen>
